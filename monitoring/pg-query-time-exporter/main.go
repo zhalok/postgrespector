@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -22,6 +23,23 @@ type queryTimeStats struct {
 	AvgSharedBlksDirtied float64
 	AvgSharedBlksWritten float64
 }
+
+type perQueryStats struct {
+	QueryID           int64
+	Query             string
+	Calls             int64
+	MeanExecTimeMs    float64
+	MeanPlanTimeMs    float64
+	Rows              int64
+	SharedBlksHit     int64
+	SharedBlksRead    int64
+	SharedBlksDirtied int64
+	SharedBlksWritten int64
+}
+
+// topQueryLimit caps the per-query table to the slowest query shapes by mean
+// execution time, keeping Prometheus label cardinality bounded.
+const topQueryLimit = 10
 
 var db *sql.DB
 
@@ -80,11 +98,96 @@ func collectQueryTimeStats(ctx context.Context) (queryTimeStats, error) {
 	return s, err
 }
 
+// collectPerQueryStats returns the slowest query shapes by mean execution
+// time, for a per-query breakdown table (as opposed to the cross-query
+// aggregates in collectQueryTimeStats).
+func collectPerQueryStats(ctx context.Context) ([]perQueryStats, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT
+			queryid,
+			query,
+			calls,
+			mean_exec_time,
+			mean_plan_time,
+			rows,
+			shared_blks_hit,
+			shared_blks_read,
+			shared_blks_dirtied,
+			shared_blks_written
+		FROM pg_stat_statements
+		ORDER BY mean_exec_time DESC
+		LIMIT $1
+	`, topQueryLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var out []perQueryStats
+	for rows.Next() {
+		var s perQueryStats
+		if err := rows.Scan(
+			&s.QueryID, &s.Query, &s.Calls, &s.MeanExecTimeMs, &s.MeanPlanTimeMs, &s.Rows,
+			&s.SharedBlksHit, &s.SharedBlksRead, &s.SharedBlksDirtied, &s.SharedBlksWritten,
+		); err != nil {
+			return nil, err
+		}
+		out = append(out, s)
+	}
+	return out, rows.Err()
+}
+
+// sanitizeLabel escapes a string for use as a Prometheus exposition-format
+// label value and truncates it so a single query text can't blow up the
+// response body.
+func sanitizeLabel(s string) string {
+	const maxLen = 200
+	r := []rune(s)
+	if len(r) > maxLen {
+		s = string(r[:maxLen]) + "..."
+	}
+	s = strings.ReplaceAll(s, `\`, `\\`)
+	s = strings.ReplaceAll(s, `"`, `\"`)
+	s = strings.ReplaceAll(s, "\n", `\n`)
+	return s
+}
+
+func writePerQueryMetrics(w http.ResponseWriter, queries []perQueryStats) {
+	metrics := []struct {
+		name string
+		help string
+		val  func(perQueryStats) float64
+	}{
+		{"pg_query_stats_calls", "Number of calls for this query shape", func(s perQueryStats) float64 { return float64(s.Calls) }},
+		{"pg_query_stats_mean_exec_time_ms", "Mean execution time for this query shape, in milliseconds", func(s perQueryStats) float64 { return s.MeanExecTimeMs }},
+		{"pg_query_stats_mean_plan_time_ms", "Mean planning time for this query shape, in milliseconds", func(s perQueryStats) float64 { return s.MeanPlanTimeMs }},
+		{"pg_query_stats_rows", "Total rows returned/affected by this query shape", func(s perQueryStats) float64 { return float64(s.Rows) }},
+		{"pg_query_stats_shared_blks_hit", "Total shared buffer cache hits for this query shape", func(s perQueryStats) float64 { return float64(s.SharedBlksHit) }},
+		{"pg_query_stats_shared_blks_read", "Total shared buffer disk reads for this query shape", func(s perQueryStats) float64 { return float64(s.SharedBlksRead) }},
+		{"pg_query_stats_shared_blks_dirtied", "Total shared buffers dirtied for this query shape", func(s perQueryStats) float64 { return float64(s.SharedBlksDirtied) }},
+		{"pg_query_stats_shared_blks_written", "Total shared buffers written for this query shape", func(s perQueryStats) float64 { return float64(s.SharedBlksWritten) }},
+	}
+
+	for _, m := range metrics {
+		fmt.Fprintf(w, "# HELP %s %s\n", m.name, m.help)
+		fmt.Fprintf(w, "# TYPE %s gauge\n", m.name)
+		for _, q := range queries {
+			fmt.Fprintf(w, "%s{queryid=\"%d\",query=\"%s\"} %f\n", m.name, q.QueryID, sanitizeLabel(q.Query), m.val(q))
+		}
+	}
+}
+
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 
 	stats, err := collectQueryTimeStats(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	perQuery, err := collectPerQueryStats(ctx)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -123,6 +226,8 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "# HELP pg_query_avg_shared_blks_written Average shared buffers written per query execution, across all tracked statements\n")
 	fmt.Fprintf(w, "# TYPE pg_query_avg_shared_blks_written gauge\n")
 	fmt.Fprintf(w, "pg_query_avg_shared_blks_written %f\n", stats.AvgSharedBlksWritten)
+
+	writePerQueryMetrics(w, perQuery)
 }
 
 func main() {

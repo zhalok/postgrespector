@@ -294,6 +294,73 @@
           }
         }
       }
+    },
+     {
+      "id": 12,
+      "title": "Top 10 Slowest Queries",
+      "type": "table",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 48 },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": { "byField": "query", "mode": "outer" }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [{ "field": "Value #B", "desc": true }]
+          }
+        },
+        {
+          "id": "limit",
+          "options": { "limitField": 10 }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "Time 6": true,
+              "Time 7": true,
+              "Time 8": true,
+              "queryid 2": true,
+              "queryid 3": true,
+              "queryid 4": true,
+              "queryid 5": true,
+              "queryid 6": true,
+              "queryid 7": true,
+              "queryid 8": true
+            },
+            "renameByName": {
+              "queryid 1": "queryid",
+              "Value #A": "calls",
+              "Value #B": "mean exec time (ms)",
+              "Value #C": "mean plan time (ms)",
+              "Value #D": "rows",
+              "Value #E": "shared blks hit",
+              "Value #F": "shared blks read",
+              "Value #G": "shared blks dirtied",
+              "Value #H": "shared blks written"
+            }
+          }
+        }
+      ],
+      "targets": [
+        { "refId": "A", "expr": "pg_query_stats_calls", "format": "table", "instant": true },
+        { "refId": "B", "expr": "pg_query_stats_mean_exec_time_ms", "format": "table", "instant": true },
+        { "refId": "C", "expr": "pg_query_stats_mean_plan_time_ms", "format": "table", "instant": true },
+        { "refId": "D", "expr": "pg_query_stats_rows", "format": "table", "instant": true },
+        { "refId": "E", "expr": "pg_query_stats_shared_blks_hit", "format": "table", "instant": true },
+        { "refId": "F", "expr": "pg_query_stats_shared_blks_read", "format": "table", "instant": true },
+        { "refId": "G", "expr": "pg_query_stats_shared_blks_dirtied", "format": "table", "instant": true },
+        { "refId": "H", "expr": "pg_query_stats_shared_blks_written", "format": "table", "instant": true }
+      ]
     }
   ]
 }
