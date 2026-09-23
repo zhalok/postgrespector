@@ -9,12 +9,11 @@ behavior) via Prometheus/Grafana.
 
 ## Topology
 
-Two parallel stacks, defined in `compose.yml`, sharing the same Node/Express
-app (`server/index.js`) and business logic (`server/services/orders.service.js`), differing
-only in the storage repository selected via the `DB` env var:
+Two parallel stacks, defined in `compose.yml`, differing only in backing
+store:
 
-- **Postgres stack**: `postgres` → `server-postgres` (port 3001) → `writer-postgres` (writer) + `reader-postgres` (reader)
-- **Mongo stack**: `mongodb` → `server-mongo` (port 3002) → `writer-mongo` (writer) + `reader-mongo` (reader)
+- **Postgres stack**: `postgres` (port 3001) → `writer-postgres` (writer) + `reader-postgres` (reader)
+- **Mongo stack**: `mongodb` (port 3002) → `writer-mongo` (writer) + `reader-mongo` (reader)
 
 Both stacks run against the same host machine simultaneously so results are
 comparable. Observability is shared: `cgroup-exporter` → `prometheus` →
@@ -32,15 +31,13 @@ columns.
   `order_id`/`timestamp`/`status`, and `JSONB` columns for `customer`,
   `financials`, `line_items`, `polymorphic_metadata`, `event_timeline`. One
   btree index on `"timestamp"` (ascending).
-- **MongoDB** (`repositories/orders.repository.mongodb.js`): single `orders`
-  collection, same shape as a native document, with an index on `timestamp`
-  (ascending).
+- **MongoDB**: single `orders` collection, same shape as a native document,
+  with an index on `timestamp` (ascending).
 
 ## Write path
 
 `clients/writer/main.go` is a Go load generator: a pool of workers repeatedly POST
-new orders to `/orders` (via `services/orders.service.js` →
-`createOrder`/`createOrderHandler`), each stamped with `timestamp = now()` at
+new orders to `/orders`, each stamped with `timestamp = now()` at
 insert time. Because timestamps are assigned at write time, new rows are
 always appended at the "newest" end of the timestamp index — the write
 frontier only ever moves forward.
