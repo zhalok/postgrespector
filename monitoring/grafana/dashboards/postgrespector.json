@@ -304,7 +304,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "pg_query_avg_shared_blks_hit",
+                        "expr": "sum(pg_query_avg_shared_blks_hit)",
                         "legendFormat": "avg blocks hit",
                         "range": true
                       },
@@ -325,7 +325,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "pg_query_avg_shared_blks_read",
+                        "expr": "sum(pg_query_avg_shared_blks_read)",
                         "legendFormat": "avg blocks read",
                         "range": true
                       },
@@ -346,7 +346,7 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "pg_block_size_bytes",
+                        "expr": "sum(pg_block_size_bytes)",
                         "legendFormat": "block size bytes",
                         "range": true
                       },
