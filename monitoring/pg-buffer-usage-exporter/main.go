@@ -91,6 +91,12 @@ func main() {
 	db = connect()
 	defer db.Close()
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if _, err := db.ExecContext(ctx, `CREATE EXTENSION IF NOT EXISTS pg_buffercache`); err != nil {
+		panic(err)
+	}
+
 	http.HandleFunc("/metrics", metricsHandler)
 	fmt.Println("pg-buffer-usage-exporter listening on :9108")
 	if err := http.ListenAndServe(":9108", nil); err != nil {
