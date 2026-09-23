@@ -1,0 +1,116 @@
+{
+  "kind": "Panel",
+  "spec": {
+    "data": {
+      "kind": "QueryGroup",
+      "spec": {
+        "queries": [
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "hidden": false,
+              "query": {
+                "group": "",
+                "kind": "DataQuery",
+                "spec": {
+                  "expr": "max by (container_name) (cgroup_memory_usage_bytes{container_name=~\"postgres|mongodb\"})",
+                  "legendFormat": "{{container_name}}"
+                },
+                "version": "v0"
+              },
+              "refId": "A"
+            }
+          }
+        ],
+        "queryOptions": {},
+        "transformations": []
+      }
+    },
+    "description": "",
+    "id": 2,
+    "links": [],
+    "title": "Memory Usage",
+    "vizConfig": {
+      "group": "timeseries",
+      "kind": "VizConfig",
+      "spec": {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "bytes"
+          },
+          "overrides": []
+        },
+        "options": {
+          "annotations": {
+            "clustering": -1,
+            "multiLane": false
+          },
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "enableFacetedFilter": false,
+            "overflow": "ellipsis",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+          }
+        }
+      },
+      "version": "13.1.0"
+    }
+  }
+}

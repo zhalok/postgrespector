@@ -1,0 +1,120 @@
+{
+  "kind": "Panel",
+  "spec": {
+    "data": {
+      "kind": "QueryGroup",
+      "spec": {
+        "queries": [
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "hidden": false,
+              "query": {
+                "datasource": {
+                  "name": "Loki"
+                },
+                "group": "loki",
+                "kind": "DataQuery",
+                "spec": {
+                  "direction": "backward",
+                  "editorMode": "code",
+                  "expr": "quantile_over_time(0.90, {container=~\"server-postgres|server-mongo\"} | regexp `(?P<method>\\S+) (?P<url>\\S+) (?P<status>\\d+) (?P<duration>\\d+)ms` | method=\"POST\" | unwrap duration [5s]) by (container)",
+                  "queryType": "range"
+                },
+                "version": "v0"
+              },
+              "refId": "A"
+            }
+          }
+        ],
+        "queryOptions": {},
+        "transformations": []
+      }
+    },
+    "description": "",
+    "id": 7,
+    "links": [],
+    "title": "Write (POST) p90 Latency (ms)",
+    "vizConfig": {
+      "group": "timeseries",
+      "kind": "VizConfig",
+      "spec": {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "annotations": {
+            "clustering": -1,
+            "multiLane": false
+          },
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "enableFacetedFilter": false,
+            "overflow": "ellipsis",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+          }
+        }
+      },
+      "version": "13.1.0"
+    }
+  }
+}

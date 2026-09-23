@@ -1,0 +1,131 @@
+{
+  "kind": "Panel",
+  "spec": {
+    "data": {
+      "kind": "QueryGroup",
+      "spec": {
+        "queries": [
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "hidden": false,
+              "query": {
+                "group": "",
+                "kind": "DataQuery",
+                "spec": {
+                  "expr": "rate(pg_stat_database_blks_hit_total[1m])",
+                  "legendFormat": "memory hit (blks_hit)"
+                },
+                "version": "v0"
+              },
+              "refId": "A"
+            }
+          },
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "hidden": false,
+              "query": {
+                "group": "",
+                "kind": "DataQuery",
+                "spec": {
+                  "expr": "rate(pg_stat_database_blks_read_total[1m])",
+                  "legendFormat": "disk read (blks_read)"
+                },
+                "version": "v0"
+              },
+              "refId": "B"
+            }
+          }
+        ],
+        "queryOptions": {},
+        "transformations": []
+      }
+    },
+    "description": "",
+    "id": 9,
+    "links": [],
+    "title": "Postgres Buffer Cache Hit vs Disk Read (blocks/s)",
+    "vizConfig": {
+      "group": "timeseries",
+      "kind": "VizConfig",
+      "spec": {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "annotations": {
+            "clustering": -1,
+            "multiLane": false
+          },
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "enableFacetedFilter": false,
+            "overflow": "ellipsis",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+          }
+        }
+      },
+      "version": "13.1.0"
+    }
+  }
+}

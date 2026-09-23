@@ -1,0 +1,147 @@
+{
+  "kind": "Panel",
+  "spec": {
+    "data": {
+      "kind": "QueryGroup",
+      "spec": {
+        "queries": [
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "hidden": false,
+              "query": {
+                "datasource": {
+                  "name": "PBFA97CFB590B2093"
+                },
+                "group": "prometheus",
+                "kind": "DataQuery",
+                "spec": {
+                  "editorMode": "code",
+                  "expr": "sum(mongo_total_size_bytes{})",
+                  "legendFormat": "mongodb",
+                  "range": true
+                },
+                "version": "v0"
+              },
+              "refId": "mongodb"
+            }
+          },
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "hidden": false,
+              "query": {
+                "datasource": {
+                  "name": "PBFA97CFB590B2093"
+                },
+                "group": "prometheus",
+                "kind": "DataQuery",
+                "spec": {
+                  "editorMode": "code",
+                  "expr": "sum(pg_total_relation_size_bytes{ })",
+                  "instant": false,
+                  "legendFormat": "postgres",
+                  "range": true
+                },
+                "version": "v0"
+              },
+              "refId": "B"
+            }
+          }
+        ],
+        "queryOptions": {},
+        "transformations": []
+      }
+    },
+    "description": "",
+    "id": 20,
+    "links": [],
+    "title": "Postgres vs MongoDB Storage Size",
+    "vizConfig": {
+      "group": "timeseries",
+      "kind": "VizConfig",
+      "spec": {
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic",
+              "seriesBy": "max"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.9,
+              "drawStyle": "line",
+              "fillOpacity": 50,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineStyle": {
+                "fill": "solid"
+              },
+              "lineWidth": 2,
+              "pointSize": 1,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "always",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "normal"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": 0
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            },
+            "unit": "bytes"
+          },
+          "overrides": []
+        },
+        "options": {
+          "annotations": {
+            "clustering": -1,
+            "multiLane": false
+          },
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "enableFacetedFilter": false,
+            "overflow": "ellipsis",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+          }
+        }
+      },
+      "version": "13.1.0"
+    }
+  }
+}

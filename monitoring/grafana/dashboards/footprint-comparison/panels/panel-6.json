@@ -1,0 +1,165 @@
+{
+  "kind": "Panel",
+  "spec": {
+    "id": 6,
+    "title": "MongoDB Storage Breakdown",
+    "description": "",
+    "links": [],
+    "data": {
+      "kind": "QueryGroup",
+      "spec": {
+        "queries": [
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "query": {
+                "kind": "DataQuery",
+                "group": "prometheus",
+                "version": "v0",
+                "datasource": {
+                  "name": "PBFA97CFB590B2093"
+                },
+                "spec": {
+                  "editorMode": "code",
+                  "expr": "avg(mongo_collection_size_bytes{ })",
+                  "legendFormat": "collection size",
+                  "range": true
+                }
+              },
+              "refId": "collection_size",
+              "hidden": false
+            }
+          },
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "query": {
+                "kind": "DataQuery",
+                "group": "prometheus",
+                "version": "v0",
+                "datasource": {
+                  "name": "PBFA97CFB590B2093"
+                },
+                "spec": {
+                  "editorMode": "code",
+                  "expr": "avg(mongo_index_size_bytes{ })",
+                  "instant": false,
+                  "legendFormat": "index size",
+                  "range": true
+                }
+              },
+              "refId": "index_size",
+              "hidden": false
+            }
+          },
+          {
+            "kind": "PanelQuery",
+            "spec": {
+              "query": {
+                "kind": "DataQuery",
+                "group": "prometheus",
+                "version": "v0",
+                "datasource": {
+                  "name": "PBFA97CFB590B2093"
+                },
+                "spec": {
+                  "editorMode": "code",
+                  "expr": "avg(mongo_total_size_bytes{ })",
+                  "instant": false,
+                  "legendFormat": "total size compressed",
+                  "range": true
+                }
+              },
+              "refId": "total_size",
+              "hidden": false
+            }
+          }
+        ],
+        "transformations": [],
+        "queryOptions": {}
+      }
+    },
+    "vizConfig": {
+      "kind": "VizConfig",
+      "group": "timeseries",
+      "version": "13.1.0",
+      "spec": {
+        "options": {
+          "annotations": {
+            "clustering": -1,
+            "multiLane": false
+          },
+          "legend": {
+            "calcs": [],
+            "displayMode": "list",
+            "enableFacetedFilter": false,
+            "overflow": "ellipsis",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "tooltip": {
+            "hideZeros": false,
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "fieldConfig": {
+          "defaults": {
+            "unit": "bytes",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "value": 0,
+                  "color": "green"
+                },
+                {
+                  "value": 80,
+                  "color": "red"
+                }
+              ]
+            },
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "barWidthFactor": 0.6,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 1,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "showValues": false,
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            }
+          },
+          "overrides": []
+        }
+      }
+    }
+  }
+}

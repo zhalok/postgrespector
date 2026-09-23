@@ -1,0 +1,74 @@
+{
+  "title": "Container cgroup Metrics",
+  "uid": "cgroup-metrics",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 3,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU Usage (cores)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (container_name) (rate(cgroup_cpu_usage_seconds_total{container_name!~\"grafana|prometheus\"}[1m]))",
+          "legendFormat": "{{container_name}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "max by (container_name) (cgroup_memory_usage_bytes)",
+          "legendFormat": "{{container_name}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Disk Read Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "Bps" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "sum by (container_name) (rate(cgroup_io_read_bytes_total[1m]))",
+          "legendFormat": "{{container_name}}"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Disk Write Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": { "defaults": { "unit": "Bps" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "sum by (container_name) (rate(cgroup_io_write_bytes_total[1m]))",
+          "legendFormat": "{{container_name}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "PIDs",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "max by (container_name) (cgroup_pids)",
+          "legendFormat": "{{container_name}}"
+        }
+      ]
+    }
+  ]
+}

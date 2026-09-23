@@ -1,0 +1,21 @@
+{
+  "name": "jsonb-experiments",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "insert": "node insert_huge_json.js",
+    "insert:customers": "node insert_customers.js",
+    "start": "node server/index.js",
+    "start:postgres": "DB=postgres PORT=3001 node server/index.js",
+    "start:mongo": "DB=mongo PORT=3002 node server/index.js",
+    "grafana:build": "node monitoring/grafana/build-dashboards.js",
+    "grafana:decompose": "node monitoring/grafana/decompose-dashboards.js"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "express": "^5.2.1",
+    "mongodb": "^7.5.0",
+    "pg": "^8.11.5"
+  }
+}
