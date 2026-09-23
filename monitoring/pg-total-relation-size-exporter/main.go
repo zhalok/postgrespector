@@ -11,7 +11,8 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-type sizeStats struct {
+type tableSizeStats struct {
+	Table      string
 	TotalBytes int64
 }
 
@@ -48,14 +49,28 @@ func envOr(key, fallback string) string {
 	return fallback
 }
 
-func collectSizeStats(ctx context.Context) (sizeStats, error) {
-	var s sizeStats
-
-	if err := db.QueryRowContext(ctx, `SELECT pg_total_relation_size('orders')`).Scan(&s.TotalBytes); err != nil {
-		return s, err
+func collectSizeStats(ctx context.Context) ([]tableSizeStats, error) {
+	rows, err := db.QueryContext(ctx, `
+		SELECT c.relname, pg_total_relation_size(c.oid)
+		FROM pg_catalog.pg_class c
+		JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+		WHERE c.relkind = 'r' AND n.nspname = 'public'
+		ORDER BY c.relname
+	`)
+	if err != nil {
+		return nil, err
 	}
+	defer rows.Close()
 
-	return s, nil
+	var stats []tableSizeStats
+	for rows.Next() {
+		var s tableSizeStats
+		if err := rows.Scan(&s.Table, &s.TotalBytes); err != nil {
+			return nil, err
+		}
+		stats = append(stats, s)
+	}
+	return stats, rows.Err()
 }
 
 func metricsHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,9 +85,11 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "text/plain; version=0.0.4")
 
-	fmt.Fprintf(w, "# HELP pg_total_relation_size_bytes Total on-disk size of the orders table, including indexes and TOAST, in bytes\n")
+	fmt.Fprintf(w, "# HELP pg_total_relation_size_bytes Total on-disk size of the table, including indexes and TOAST, in bytes\n")
 	fmt.Fprintf(w, "# TYPE pg_total_relation_size_bytes gauge\n")
-	fmt.Fprintf(w, "pg_total_relation_size_bytes{table=\"orders\"} %d\n", stats.TotalBytes)
+	for _, s := range stats {
+		fmt.Fprintf(w, "pg_total_relation_size_bytes{table=%q} %d\n", s.Table, s.TotalBytes)
+	}
 }
 
 func main() {

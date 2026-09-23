@@ -1,9 +1,9 @@
 # Postgrespector
 
 A standalone Postgres inspection stack: a single Postgres instance with a
-JSONB-shaped `orders` table, observed through Prometheus/Grafana (CPU,
-memory, disk I/O, cache/buffer stats, query timing) and Loki/Promtail for
-container logs.
+simple `products` table, observed through Prometheus/Grafana (CPU, memory,
+disk I/O, cache/buffer stats, query timing) and Loki/Promtail for container
+logs.
 
 ## Topology
 
@@ -20,12 +20,10 @@ effect on the dashboards.
 
 ## Data model
 
-`init-db/init.sql` creates an `orders` table: typed columns for
-`order_id`/`timestamp`/`status`, and `JSONB` columns for `customer`,
-`financials`, `line_items`, `polymorphic_metadata`, `event_timeline`. This
-shape is intentionally nested/irregular, useful for exercising JSONB path
-extraction (`->>`, `#>>`, `jsonb_build_object`) rather than flat columns.
-There's a btree index on `status`.
+`init-db/init.sql` creates a `products` table with plain, traditional
+columns (no JSON/document columns): `product_id`, `sku`, `name`,
+`description`, `category`, `price`, `quantity`, `created_at`. There's a
+btree index on `category`.
 
 ## What's being observed
 

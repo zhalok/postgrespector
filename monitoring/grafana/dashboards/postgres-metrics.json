@@ -39,32 +39,32 @@
     },
     {
       "id": 4,
-      "title": "Orders Table Size",
+      "title": "Table Size",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
       "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
       "targets": [
-        { "expr": "pg_table_size_bytes{table=\"orders\"}", "legendFormat": "orders table" }
+        { "expr": "pg_table_size_bytes", "legendFormat": "{{table}}" }
       ]
     },
     {
       "id": 5,
-      "title": "Orders Index Size",
+      "title": "Index Size",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
       "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
       "targets": [
-        { "expr": "pg_index_size_bytes{table=\"orders\",index=\"all\"}", "legendFormat": "orders indexes" }
+        { "expr": "pg_index_size_bytes", "legendFormat": "{{table}}" }
       ]
     },
     {
       "id": 6,
-      "title": "Orders Total Relation Size",
+      "title": "Total Relation Size",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
       "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
       "targets": [
-        { "expr": "pg_total_relation_size_bytes{table=\"orders\"}", "legendFormat": "orders total (table+index+toast)" }
+        { "expr": "pg_total_relation_size_bytes", "legendFormat": "{{table}} (table+index+toast)" }
       ]
     },
     {
