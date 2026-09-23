@@ -1,12 +1,12 @@
-CREATE TABLE IF NOT EXISTS orders (
-    order_id TEXT PRIMARY KEY,
-    "timestamp" TIMESTAMPTZ NOT NULL,
-    status TEXT NOT NULL,
-    customer JSONB,
-    financials JSONB,
-    line_items JSONB,
-    polymorphic_metadata JSONB,
-    event_timeline JSONB
+CREATE TABLE IF NOT EXISTS products (
+    product_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sku TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    description TEXT,
+    category TEXT NOT NULL,
+    price NUMERIC(10, 2) NOT NULL,
+    quantity INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_orders_status ON orders (status);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products (category);
