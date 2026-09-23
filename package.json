@@ -6,6 +6,7 @@
   "scripts": {
     "insert": "node insert_huge_json.js",
     "insert:customers": "node insert_customers.js",
+    "load-test": "node load-test.js",
     "grafana:build": "node monitoring/grafana/build-dashboards.js",
     "grafana:decompose": "node monitoring/grafana/decompose-dashboards.js"
   },

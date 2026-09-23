@@ -120,6 +120,22 @@ services:
       postgres:
         condition: service_healthy
 
+  pg-buffer-usage-exporter:
+    build: ./monitoring/pg-buffer-usage-exporter
+    container_name: pg-buffer-usage-exporter
+    restart: always
+    environment:
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGUSER=postgres
+      - PGPASSWORD=postgres
+      - PGDATABASE=postgres
+    ports:
+      - 9108:9108
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -135,6 +151,7 @@ services:
       - pg-table-size-exporter
       - pg-total-relation-size-exporter
       - pg-query-time-exporter
+      - pg-buffer-usage-exporter
 
   loki:
     image: grafana/loki:latest
