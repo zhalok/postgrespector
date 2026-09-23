@@ -5,8 +5,8 @@
     "name": "adsnc94",
     "namespace": "default",
     "uid": "9e465610-2069-4dcc-a7c4-1143c735bf7b",
-    "resourceVersion": "1790157523336994",
-    "generation": 2,
+    "resourceVersion": "1790157687379999",
+    "generation": 3,
     "creationTimestamp": "2026-09-23T09:51:50Z",
     "labels": {
       "grafana.app/deprecatedInternalID": "4020014415413248"
@@ -15,11 +15,11 @@
       "grafana.app/createdBy": "access-policy:service",
       "grafana.app/managedBy": "classic-file-provisioning",
       "grafana.app/managerId": "cgroup-metrics",
-      "grafana.app/sourceChecksum": "e7881c4d7b15eaf43b127c9e15f76154",
+      "grafana.app/sourceChecksum": "8fedde08bf78fd435da2ac59afcf54cb",
       "grafana.app/sourcePath": "/etc/grafana/dashboards/postgrespector.json",
-      "grafana.app/sourceTimestamp": "1790157518000",
+      "grafana.app/sourceTimestamp": "1790157682000",
       "grafana.app/updatedBy": "access-policy:service",
-      "grafana.app/updatedTimestamp": "2026-09-23T09:58:43Z",
+      "grafana.app/updatedTimestamp": "2026-09-23T10:01:27Z",
       "grafana.app/folder": ""
     }
   },
@@ -295,7 +295,7 @@
                 {
                   "kind": "PanelQuery",
                   "spec": {
-                    "hidden": false,
+                    "hidden": true,
                     "query": {
                       "datasource": {
                         "name": "PBFA97CFB590B2093"
@@ -304,8 +304,8 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "pg_buffercache_used_buffers*pg_block_size_bytes",
-                        "legendFormat": "used pages",
+                        "expr": "pg_query_avg_shared_blks_hit",
+                        "legendFormat": "avg blocks hit",
                         "range": true
                       },
                       "version": "v0"
@@ -316,7 +316,7 @@
                 {
                   "kind": "PanelQuery",
                   "spec": {
-                    "hidden": false,
+                    "hidden": true,
                     "query": {
                       "datasource": {
                         "name": "PBFA97CFB590B2093"
@@ -325,8 +325,8 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "pg_buffercache_dirty_buffers",
-                        "legendFormat": "dirty pages",
+                        "expr": "pg_query_avg_shared_blks_read",
+                        "legendFormat": "avg blocks read",
                         "range": true
                       },
                       "version": "v0"
@@ -337,7 +337,7 @@
                 {
                   "kind": "PanelQuery",
                   "spec": {
-                    "hidden": false,
+                    "hidden": true,
                     "query": {
                       "datasource": {
                         "name": "PBFA97CFB590B2093"
@@ -346,13 +346,32 @@
                       "kind": "DataQuery",
                       "spec": {
                         "editorMode": "code",
-                        "expr": "pg_buffercache_total_buffers",
-                        "legendFormat": "total pages",
+                        "expr": "pg_block_size_bytes",
+                        "legendFormat": "block size bytes",
                         "range": true
                       },
                       "version": "v0"
                     },
                     "refId": "C"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "__expr__"
+                      },
+                      "group": "__expr__",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expression": "($A + $B) * $C",
+                        "type": "math"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "Average Buffer Usage"
                   }
                 }
               ],
@@ -363,7 +382,7 @@
           "description": "",
           "id": 5,
           "links": [],
-          "title": "Buffer Usage",
+          "title": "Average Buffer Usage",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -420,7 +439,127 @@
                       }
                     ]
                   },
-                  "unit": "decbytes"
+                  "unit": "bytes"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "PBFA97CFB590B2093"
+                      },
+                      "group": "prometheus",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "editorMode": "code",
+                        "expr": "sum by (container_name) (rate(cgroup_cpu_usage_seconds_total{container_name=\"postgres\"}[1m]))",
+                        "legendFormat": "{{container_name}}",
+                        "range": true
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 6,
+          "links": [],
+          "title": "CPU Usage (cores)",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
                 },
                 "overrides": []
               },
@@ -478,6 +617,15 @@
               "element": {
                 "kind": "ElementReference",
                 "name": "panel-3"
+              }
+            }
+          },
+          {
+            "kind": "AutoGridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-6"
               }
             }
           }
