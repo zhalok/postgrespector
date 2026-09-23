@@ -16,6 +16,11 @@ type queryTimeStats struct {
 	P90ExecTimeMs float64
 	AvgPlanTimeMs float64
 	P90PlanTimeMs float64
+
+	AvgSharedBlksHit     float64
+	AvgSharedBlksRead    float64
+	AvgSharedBlksDirtied float64
+	AvgSharedBlksWritten float64
 }
 
 var db *sql.DB
@@ -62,9 +67,16 @@ func collectQueryTimeStats(ctx context.Context) (queryTimeStats, error) {
 			coalesce(sum(total_exec_time) / nullif(sum(calls), 0), 0),
 			coalesce(percentile_cont(0.9) WITHIN GROUP (ORDER BY mean_exec_time), 0),
 			coalesce(sum(total_plan_time) / nullif(sum(plans), 0), 0),
-			coalesce(percentile_cont(0.9) WITHIN GROUP (ORDER BY mean_plan_time) FILTER (WHERE plans > 0), 0)
+			coalesce(percentile_cont(0.9) WITHIN GROUP (ORDER BY mean_plan_time) FILTER (WHERE plans > 0), 0),
+			coalesce(sum(shared_blks_hit) / nullif(sum(calls), 0), 0),
+			coalesce(sum(shared_blks_read) / nullif(sum(calls), 0), 0),
+			coalesce(sum(shared_blks_dirtied) / nullif(sum(calls), 0), 0),
+			coalesce(sum(shared_blks_written) / nullif(sum(calls), 0), 0)
 		FROM pg_stat_statements
-	`).Scan(&s.AvgExecTimeMs, &s.P90ExecTimeMs, &s.AvgPlanTimeMs, &s.P90PlanTimeMs)
+	`).Scan(
+		&s.AvgExecTimeMs, &s.P90ExecTimeMs, &s.AvgPlanTimeMs, &s.P90PlanTimeMs,
+		&s.AvgSharedBlksHit, &s.AvgSharedBlksRead, &s.AvgSharedBlksDirtied, &s.AvgSharedBlksWritten,
+	)
 	return s, err
 }
 
@@ -95,6 +107,22 @@ func metricsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "# HELP pg_query_p90_plan_time_ms 90th percentile of per-query-shape mean planning time, in milliseconds\n")
 	fmt.Fprintf(w, "# TYPE pg_query_p90_plan_time_ms gauge\n")
 	fmt.Fprintf(w, "pg_query_p90_plan_time_ms %f\n", stats.P90PlanTimeMs)
+
+	fmt.Fprintf(w, "# HELP pg_query_avg_shared_blks_hit Average shared buffer cache hits per query execution, across all tracked statements\n")
+	fmt.Fprintf(w, "# TYPE pg_query_avg_shared_blks_hit gauge\n")
+	fmt.Fprintf(w, "pg_query_avg_shared_blks_hit %f\n", stats.AvgSharedBlksHit)
+
+	fmt.Fprintf(w, "# HELP pg_query_avg_shared_blks_read Average shared buffer disk reads per query execution, across all tracked statements\n")
+	fmt.Fprintf(w, "# TYPE pg_query_avg_shared_blks_read gauge\n")
+	fmt.Fprintf(w, "pg_query_avg_shared_blks_read %f\n", stats.AvgSharedBlksRead)
+
+	fmt.Fprintf(w, "# HELP pg_query_avg_shared_blks_dirtied Average shared buffers dirtied per query execution, across all tracked statements\n")
+	fmt.Fprintf(w, "# TYPE pg_query_avg_shared_blks_dirtied gauge\n")
+	fmt.Fprintf(w, "pg_query_avg_shared_blks_dirtied %f\n", stats.AvgSharedBlksDirtied)
+
+	fmt.Fprintf(w, "# HELP pg_query_avg_shared_blks_written Average shared buffers written per query execution, across all tracked statements\n")
+	fmt.Fprintf(w, "# TYPE pg_query_avg_shared_blks_written gauge\n")
+	fmt.Fprintf(w, "pg_query_avg_shared_blks_written %f\n", stats.AvgSharedBlksWritten)
 }
 
 func main() {
