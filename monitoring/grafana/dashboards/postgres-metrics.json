@@ -14,7 +14,10 @@
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
       "targets": [
-        { "expr": "rate(pg_stat_database_blks_hit_total[1m])", "legendFormat": "blocks hit/s" }
+        {
+          "expr": "rate(pg_stat_database_blks_hit_total[1m])",
+          "legendFormat": "blocks hit/s"
+        }
       ]
     },
     {
@@ -24,7 +27,10 @@
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ops" }, "overrides": [] },
       "targets": [
-        { "expr": "rate(pg_stat_database_blks_read_total[1m])", "legendFormat": "blocks read/s" }
+        {
+          "expr": "rate(pg_stat_database_blks_read_total[1m])",
+          "legendFormat": "blocks read/s"
+        }
       ]
     },
     {
@@ -64,7 +70,10 @@
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
       "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
       "targets": [
-        { "expr": "pg_total_relation_size_bytes", "legendFormat": "{{table}} (table+index+toast)" }
+        {
+          "expr": "pg_total_relation_size_bytes",
+          "legendFormat": "{{table}} (table+index+toast)"
+        }
       ]
     },
     {
@@ -106,6 +115,185 @@
       "targets": [
         { "expr": "pg_query_p90_plan_time_ms", "legendFormat": "p90 plan time" }
       ]
+    },
+    {
+      "id": 11,
+      "title": "Average Buffer Usage",
+      "description": "",
+      "links": [],
+      "data": {
+        "kind": "QueryGroup",
+        "spec": {
+          "queries": [
+            {
+              "kind": "PanelQuery",
+              "spec": {
+                "query": {
+                  "kind": "DataQuery",
+                  "version": "v0",
+                  "group": "prometheus",
+                  "datasource": {
+                    "name": "PBFA97CFB590B2093"
+                  },
+                  "spec": {
+                    "editorMode": "code",
+                    "expr": "sum(pg_query_avg_shared_blks_hit)",
+                    "legendFormat": "avg blocks hit",
+                    "range": true
+                  }
+                },
+                "refId": "A",
+                "hidden": true
+              }
+            },
+            {
+              "kind": "PanelQuery",
+              "spec": {
+                "query": {
+                  "kind": "DataQuery",
+                  "version": "v0",
+                  "group": "prometheus",
+                  "datasource": {
+                    "name": "PBFA97CFB590B2093"
+                  },
+                  "spec": {
+                    "editorMode": "code",
+                    "expr": "sum(pg_query_avg_shared_blks_read)",
+                    "legendFormat": "avg blocks read",
+                    "range": true
+                  }
+                },
+                "refId": "B",
+                "hidden": true
+              }
+            },
+            {
+              "kind": "PanelQuery",
+              "spec": {
+                "query": {
+                  "kind": "DataQuery",
+                  "version": "v0",
+                  "group": "prometheus",
+                  "datasource": {
+                    "name": "PBFA97CFB590B2093"
+                  },
+                  "spec": {
+                    "editorMode": "code",
+                    "expr": "sum(pg_block_size_bytes)",
+                    "legendFormat": "block size bytes",
+                    "range": true
+                  }
+                },
+                "refId": "C",
+                "hidden": true
+              }
+            },
+            {
+              "kind": "PanelQuery",
+              "spec": {
+                "query": {
+                  "kind": "DataQuery",
+                  "version": "v0",
+                  "group": "__expr__",
+                  "datasource": {
+                    "name": "__expr__"
+                  },
+                  "spec": {
+                    "expression": "($A + $B) * $C",
+                    "type": "math"
+                  }
+                },
+                "refId": "Average Buffer Usage",
+                "hidden": false
+              }
+            }
+          ],
+          "transformations": [],
+          "queryOptions": {}
+        }
+      },
+      "vizConfig": {
+        "kind": "VizConfig",
+        "group": "timeseries",
+        "version": "13.1.0",
+        "spec": {
+          "options": {
+            "tooltip": {
+              "mode": "single",
+              "sort": "none",
+              "hideZeros": false
+            },
+            "legend": {
+              "showLegend": true,
+              "displayMode": "list",
+              "placement": "bottom",
+              "overflow": "ellipsis",
+              "calcs": [],
+              "enableFacetedFilter": false
+            },
+            "annotations": {
+              "multiLane": false,
+              "clustering": -1
+            }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "drawStyle": "line",
+                "lineInterpolation": "linear",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "lineWidth": 1,
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "spanNulls": false,
+                "insertNulls": false,
+                "showPoints": "auto",
+                "showValues": false,
+                "pointSize": 5,
+                "stacking": {
+                  "mode": "none",
+                  "group": "A"
+                },
+                "axisPlacement": "auto",
+                "axisLabel": "",
+                "axisColorMode": "text",
+                "axisBorderShow": false,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "axisCenteredZero": false,
+                "hideFrom": {
+                  "tooltip": false,
+                  "viz": false,
+                  "legend": false
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "color": {
+                "mode": "palette-classic"
+              },
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "value": null,
+                    "color": "green"
+                  },
+                  {
+                    "value": 80,
+                    "color": "red"
+                  }
+                ]
+              },
+              "unit": "bytes"
+            },
+            "overrides": []
+          }
+        }
+      }
     }
   ]
 }
