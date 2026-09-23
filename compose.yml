@@ -12,7 +12,7 @@ services:
       - "-c"
       - "shared_buffers=2GB"
     environment:
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
     ports:
       - 5432:5432
     volumes:
@@ -61,11 +61,11 @@ services:
     container_name: postgres-hit-read-stats-exporter
     restart: always
     environment:
-      - PGHOST=postgres
-      - PGPORT=5432
-      - PGUSER=postgres
-      - PGPASSWORD=postgres
-      - PGDATABASE=postgres
+      - PGHOST=${PGHOST:-postgres}
+      - PGPORT=${PGPORT:-5432}
+      - PGUSER=${PGUSER:-postgres}
+      - PGPASSWORD=${PGPASSWORD:-postgres}
+      - PGDATABASE=${PGDATABASE:-postgres}
     ports:
       - 9101:9101
     depends_on:
@@ -77,11 +77,11 @@ services:
     container_name: pg-table-size-exporter
     restart: always
     environment:
-      - PGHOST=postgres
-      - PGPORT=5432
-      - PGUSER=postgres
-      - PGPASSWORD=postgres
-      - PGDATABASE=postgres
+      - PGHOST=${PGHOST:-postgres}
+      - PGPORT=${PGPORT:-5432}
+      - PGUSER=${PGUSER:-postgres}
+      - PGPASSWORD=${PGPASSWORD:-postgres}
+      - PGDATABASE=${PGDATABASE:-postgres}
     ports:
       - 9102:9102
     depends_on:
@@ -93,11 +93,11 @@ services:
     container_name: pg-total-relation-size-exporter
     restart: always
     environment:
-      - PGHOST=postgres
-      - PGPORT=5432
-      - PGUSER=postgres
-      - PGPASSWORD=postgres
-      - PGDATABASE=postgres
+      - PGHOST=${PGHOST:-postgres}
+      - PGPORT=${PGPORT:-5432}
+      - PGUSER=${PGUSER:-postgres}
+      - PGPASSWORD=${PGPASSWORD:-postgres}
+      - PGDATABASE=${PGDATABASE:-postgres}
     ports:
       - 9105:9105
     depends_on:
@@ -109,11 +109,11 @@ services:
     container_name: pg-query-time-exporter
     restart: always
     environment:
-      - PGHOST=postgres
-      - PGPORT=5432
-      - PGUSER=postgres
-      - PGPASSWORD=postgres
-      - PGDATABASE=postgres
+      - PGHOST=${PGHOST:-postgres}
+      - PGPORT=${PGPORT:-5432}
+      - PGUSER=${PGUSER:-postgres}
+      - PGPASSWORD=${PGPASSWORD:-postgres}
+      - PGDATABASE=${PGDATABASE:-postgres}
     ports:
       - 9107:9107
     depends_on:
@@ -125,11 +125,11 @@ services:
     container_name: pg-buffer-usage-exporter
     restart: always
     environment:
-      - PGHOST=postgres
-      - PGPORT=5432
-      - PGUSER=postgres
-      - PGPASSWORD=postgres
-      - PGDATABASE=postgres
+      - PGHOST=${PGHOST:-postgres}
+      - PGPORT=${PGPORT:-5432}
+      - PGUSER=${PGUSER:-postgres}
+      - PGPASSWORD=${PGPASSWORD:-postgres}
+      - PGDATABASE=${PGDATABASE:-postgres}
     ports:
       - 9108:9108
     depends_on:
