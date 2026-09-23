@@ -16,7 +16,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "Loki" },
-          "expr": "quantile_over_time(0.90, {container=~\"server-postgres|server-mongo\"} | regexp `(?P<method>\\S+) (?P<url>\\S+) (?P<status>\\d+) (?P<duration>\\d+)ms` | method=\"GET\" | unwrap duration [$__auto]) by (container)"
+          "expr": "quantile_over_time(0.90, {container=~\"server-postgres\"} | regexp `(?P<method>\\S+) (?P<url>\\S+) (?P<status>\\d+) (?P<duration>\\d+)ms` | method=\"GET\" | unwrap duration [$__auto]) by (container)"
         }
       ]
     },
@@ -29,7 +29,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "Loki" },
-          "expr": "quantile_over_time(0.90, {container=~\"server-postgres|server-mongo\"} | regexp `(?P<method>\\S+) (?P<url>\\S+) (?P<status>\\d+) (?P<duration>\\d+)ms` | method=\"POST\" | unwrap duration [$__auto]) by (container)"
+          "expr": "quantile_over_time(0.90, {container=~\"server-postgres\"} | regexp `(?P<method>\\S+) (?P<url>\\S+) (?P<status>\\d+) (?P<duration>\\d+)ms` | method=\"POST\" | unwrap duration [$__auto]) by (container)"
         }
       ]
     },
@@ -42,7 +42,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "Loki" },
-          "expr": "sum by (container, method, status) (rate({container=~\"server-postgres|server-mongo\"} | regexp `(?P<method>\\S+) (?P<url>\\S+) (?P<status>\\d+) (?P<duration>\\d+)ms` [$__auto]))"
+          "expr": "sum by (container, method, status) (rate({container=~\"server-postgres\"} | regexp `(?P<method>\\S+) (?P<url>\\S+) (?P<status>\\d+) (?P<duration>\\d+)ms` [$__auto]))"
         }
       ]
     },
@@ -55,7 +55,7 @@
       "targets": [
         {
           "datasource": { "type": "loki", "uid": "Loki" },
-          "expr": "{container=~\"server-postgres|server-mongo\"}"
+          "expr": "{container=~\"server-postgres\"}"
         }
       ]
     }

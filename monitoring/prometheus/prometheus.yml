@@ -14,26 +14,10 @@ scrape_configs:
     static_configs:
       - targets: ["pg-table-size-exporter:9102"]
 
-  - job_name: mongo-collection-size-exporter
-    static_configs:
-      - targets: ["mongo-collection-size-exporter:9103"]
-
-  - job_name: mongo-hit-read-stats-exporter
-    static_configs:
-      - targets: ["mongo-hit-read-stats-exporter:9104"]
-
   - job_name: pg-total-relation-size-exporter
     static_configs:
       - targets: ["pg-total-relation-size-exporter:9105"]
 
-  - job_name: mongo-total-size-exporter
-    static_configs:
-      - targets: ["mongo-total-size-exporter:9106"]
-
   - job_name: pg-query-time-exporter
     static_configs:
       - targets: ["pg-query-time-exporter:9107"]
-
-  - job_name: mongo-query-time-exporter
-    static_configs:
-      - targets: ["mongo-query-time-exporter:9108"]

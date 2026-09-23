@@ -1,5 +1,4 @@
 node_modules
-mongo-data
 postgres-data
 clients
 scripts

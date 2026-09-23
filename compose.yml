@@ -28,60 +28,6 @@ services:
     # security_opt:
     #   - seccomp=unconfined
 
-  mongo-keyfile-init:
-    image: alpine:3
-    container_name: mongo-keyfile-init
-    command:
-      - "sh"
-      - "-c"
-      - "test -f /keyfile/mongo-keyfile || head -c 756 /dev/urandom | base64 > /keyfile/mongo-keyfile; chmod 400 /keyfile/mongo-keyfile; chown 999:999 /keyfile/mongo-keyfile"
-    volumes:
-      - mongo-keyfile:/keyfile
-    restart: "no"
-
-  mongodb:
-    image: mongo:7
-    container_name: mongodb
-    restart: always
-    command:
-      - "mongod"
-      - "--replSet"
-      - "rs0"
-      - "--keyFile"
-      - "/etc/mongo-keyfile/mongo-keyfile"
-      - "--wiredTigerCacheSizeGB"
-      - "2"
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=mongo
-      - MONGO_INITDB_ROOT_PASSWORD=mongo
-    ports:
-      - 27017:27017
-    volumes:
-      - ./mongo-data:/data/db
-      - mongo-keyfile:/etc/mongo-keyfile:ro
-    depends_on:
-      mongo-keyfile-init:
-        condition: service_completed_successfully
-    healthcheck:
-      test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand(\"ping\")' -u mongo -p mongo --authenticationDatabase admin"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  mongo-rs-init:
-    image: mongo:7
-    container_name: mongo-rs-init
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    command:
-      - "mongosh"
-      - "--quiet"
-      - "mongodb://mongo:mongo@mongodb:27017/?authSource=admin"
-      - "--eval"
-      - "try { rs.status().ok } catch (e) { rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongodb:27017'}]}) }"
-    restart: "no"
-
   writer-postgres:
     build: ./clients/writer
     container_name: writer-postgres
@@ -92,18 +38,6 @@ services:
       postgres:
         condition: service_healthy
 
-  writer-mongo:
-    build: ./clients/writer
-    container_name: writer-mongo
-    restart: always
-    environment:
-      - CLIENT_BASE_URL=http://server-mongo:3002
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      mongo-rs-init:
-        condition: service_completed_successfully
-
   reader-postgres:
     build: ./clients/reader
     container_name: reader-postgres
@@ -113,18 +47,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
-  reader-mongo:
-    build: ./clients/reader
-    container_name: reader-mongo
-    restart: always
-    environment:
-      - CLIENT_BASE_URL=http://server-mongo:3002
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      mongo-rs-init:
-        condition: service_completed_successfully
 
   # cadvisor:
   #   image: gcr.io/cadvisor/cadvisor:v0.49.1
@@ -186,36 +108,6 @@ services:
       postgres:
         condition: service_healthy
 
-  mongo-collection-size-exporter:
-    build: ./monitoring/mongo-collection-size-exporter
-    container_name: mongo-collection-size-exporter
-    restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:mongo@mongodb:27017/?replicaSet=rs0&authSource=admin
-      - MONGO_DB=jsonb_experiments
-    ports:
-      - 9103:9103
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      mongo-rs-init:
-        condition: service_completed_successfully
-
-  mongo-hit-read-stats-exporter:
-    build: ./monitoring/mongo-hit-read-stats-exporter
-    container_name: mongo-hit-read-stats-exporter
-    restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:mongo@mongodb:27017/?replicaSet=rs0&authSource=admin
-      - MONGO_DB=jsonb_experiments
-    ports:
-      - 9104:9104
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      mongo-rs-init:
-        condition: service_completed_successfully
-
   pg-total-relation-size-exporter:
     build: ./monitoring/pg-total-relation-size-exporter
     container_name: pg-total-relation-size-exporter
@@ -231,21 +123,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
-  mongo-total-size-exporter:
-    build: ./monitoring/mongo-total-size-exporter
-    container_name: mongo-total-size-exporter
-    restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:mongo@mongodb:27017/?replicaSet=rs0&authSource=admin
-      - MONGO_DB=jsonb_experiments
-    ports:
-      - 9106:9106
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      mongo-rs-init:
-        condition: service_completed_successfully
 
   pg-query-time-exporter:
     build: ./monitoring/pg-query-time-exporter
@@ -263,21 +140,6 @@ services:
       postgres:
         condition: service_healthy
 
-  mongo-query-time-exporter:
-    build: ./monitoring/mongo-query-time-exporter
-    container_name: mongo-query-time-exporter
-    restart: always
-    environment:
-      - MONGO_URI=mongodb://mongo:mongo@mongodb:27017/?replicaSet=rs0&authSource=admin
-      - MONGO_DB=jsonb_experiments
-    ports:
-      - 9108:9108
-    depends_on:
-      mongodb:
-        condition: service_healthy
-      mongo-rs-init:
-        condition: service_completed_successfully
-
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -291,12 +153,8 @@ services:
       - cgroup-exporter
       - postgres-hit-read-stats-exporter
       - pg-table-size-exporter
-      - mongo-collection-size-exporter
-      - mongo-hit-read-stats-exporter
       - pg-total-relation-size-exporter
-      - mongo-total-size-exporter
       - pg-query-time-exporter
-      - mongo-query-time-exporter
 
   loki:
     image: grafana/loki:latest
@@ -349,4 +207,3 @@ volumes:
   prometheus-data:
   grafana-data:
   loki-data:
-  mongo-keyfile:
