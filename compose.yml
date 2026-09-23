@@ -28,26 +28,6 @@ services:
     # security_opt:
     #   - seccomp=unconfined
 
-  writer-postgres:
-    build: ./clients/writer
-    container_name: writer-postgres
-    restart: always
-    environment:
-      - CLIENT_BASE_URL=http://server-postgres:3001
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  reader-postgres:
-    build: ./clients/reader
-    container_name: reader-postgres
-    restart: always
-    environment:
-      - CLIENT_BASE_URL=http://server-postgres:3001
-    depends_on:
-      postgres:
-        condition: service_healthy
-
   # cadvisor:
   #   image: gcr.io/cadvisor/cadvisor:v0.49.1
   #   container_name: cadvisor
