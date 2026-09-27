@@ -60,6 +60,9 @@ docker exec -it postgres pgbench -U postgres -d postgres \
 - `-T`: run duration in seconds (use `-t` for a fixed transaction count instead)
 - `--progress`: seconds between throughput reports
 
+Or run `./pgbench/run.sh`, which prompts interactively for `-c`, `-j`, and
+`-T` (with defaults of 10/2/60) instead of typing the full command.
+
 Watch the Grafana dashboards (buffer/hit ratio, query timing) while it runs to
 see the effect of the load.
 
