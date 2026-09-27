@@ -42,6 +42,27 @@ up (`docker compose up -d postgres`) and loads the data via `docker exec ...
 psql`. Override `CONTAINER_NAME`, `PGUSER`, or `PGDATABASE` env vars if your
 setup differs from the defaults (`postgres`/`postgres`/`postgres`).
 
+## Load testing with pgbench
+
+`pgbench` ships with the `postgres` image, and `compose.yml` mounts `./pgbench`
+into the container at `/pgbench` so scripts there are runnable by path.
+
+`pgbench/customer_last_page.sql` paginates the seeded `customer` table in
+pages of 1000 rows ordered by `c_name`, always fetching the last page (the
+worst case for `OFFSET`-based pagination, since `c_name` has no index):
+
+```
+docker exec -it postgres pgbench -U postgres -d postgres \
+  -f /pgbench/customer_last_page.sql -c 10 -j 2 -T 60 --progress=10
+```
+
+- `-c`/`-j`: concurrent clients / worker threads
+- `-T`: run duration in seconds (use `-t` for a fixed transaction count instead)
+- `--progress`: seconds between throughput reports
+
+Watch the Grafana dashboards (buffer/hit ratio, query timing) while it runs to
+see the effect of the load.
+
 ## What's being observed
 
 - Prometheus/Grafana dashboards over `cgroup-exporter` metrics: per-container
