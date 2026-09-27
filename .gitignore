@@ -1,2 +1,4 @@
 node_modules
 postgres-data
+dummy-data/*.sql.gz
+dummy-data/*.sql
