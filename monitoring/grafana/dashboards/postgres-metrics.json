@@ -148,94 +148,94 @@
             },
             {
               "kind": "PanelQuery",
-  "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": true,
-                    "query": {
-                      "datasource": {
-                        "name": "PBFA97CFB590B2093"
+              "spec": {
+                "queries": [
+                  {
+                    "kind": "PanelQuery",
+                    "spec": {
+                      "hidden": true,
+                      "query": {
+                        "datasource": {
+                          "name": "PBFA97CFB590B2093"
+                        },
+                        "group": "prometheus",
+                        "kind": "DataQuery",
+                        "spec": {
+                          "editorMode": "code",
+                          "expr": "sum(pg_query_avg_shared_blks_hit)",
+                          "legendFormat": "avg blocks hit",
+                          "range": true
+                        },
+                        "version": "v0"
                       },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(pg_query_avg_shared_blks_hit)",
-                        "legendFormat": "avg blocks hit",
-                        "range": true
+                      "refId": "A"
+                    }
+                  },
+                  {
+                    "kind": "PanelQuery",
+                    "spec": {
+                      "hidden": true,
+                      "query": {
+                        "datasource": {
+                          "name": "PBFA97CFB590B2093"
+                        },
+                        "group": "prometheus",
+                        "kind": "DataQuery",
+                        "spec": {
+                          "editorMode": "code",
+                          "expr": "sum(pg_query_avg_shared_blks_read)",
+                          "legendFormat": "avg blocks read",
+                          "range": true
+                        },
+                        "version": "v0"
                       },
-                      "version": "v0"
-                    },
-                    "refId": "A"
+                      "refId": "B"
+                    }
+                  },
+                  {
+                    "kind": "PanelQuery",
+                    "spec": {
+                      "hidden": true,
+                      "query": {
+                        "datasource": {
+                          "name": "PBFA97CFB590B2093"
+                        },
+                        "group": "prometheus",
+                        "kind": "DataQuery",
+                        "spec": {
+                          "editorMode": "code",
+                          "expr": "sum(pg_block_size_bytes)",
+                          "legendFormat": "block size bytes",
+                          "range": true
+                        },
+                        "version": "v0"
+                      },
+                      "refId": "C"
+                    }
+                  },
+                  {
+                    "kind": "PanelQuery",
+                    "spec": {
+                      "hidden": false,
+                      "query": {
+                        "datasource": {
+                          "name": "__expr__"
+                        },
+                        "group": "__expr__",
+                        "kind": "DataQuery",
+                        "spec": {
+                          "expression": "($A + $B) * $C",
+                          "type": "math"
+                        },
+                        "version": "v0"
+                      },
+                      "refId": "Average Buffer Usage"
+                    }
                   }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": true,
-                    "query": {
-                      "datasource": {
-                        "name": "PBFA97CFB590B2093"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(pg_query_avg_shared_blks_read)",
-                        "legendFormat": "avg blocks read",
-                        "range": true
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "B"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": true,
-                    "query": {
-                      "datasource": {
-                        "name": "PBFA97CFB590B2093"
-                      },
-                      "group": "prometheus",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "editorMode": "code",
-                        "expr": "sum(pg_block_size_bytes)",
-                        "legendFormat": "block size bytes",
-                        "range": true
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "C"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "__expr__"
-                      },
-                      "group": "__expr__",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "expression": "($A + $B) * $C",
-                        "type": "math"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "Average Buffer Usage"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
+                ],
+                "queryOptions": {},
+                "transformations": []
+              }
             },
             {
               "kind": "PanelQuery",
@@ -365,7 +365,7 @@
         }
       }
     },
-     {
+    {
       "id": 12,
       "title": "Top 10 Slowest Queries",
       "type": "table",
@@ -422,14 +422,54 @@
         }
       ],
       "targets": [
-        { "refId": "A", "expr": "pg_query_stats_calls", "format": "table", "instant": true },
-        { "refId": "B", "expr": "pg_query_stats_mean_exec_time_ms", "format": "table", "instant": true },
-        { "refId": "C", "expr": "pg_query_stats_mean_plan_time_ms", "format": "table", "instant": true },
-        { "refId": "D", "expr": "pg_query_stats_rows", "format": "table", "instant": true },
-        { "refId": "E", "expr": "pg_query_stats_shared_blks_hit", "format": "table", "instant": true },
-        { "refId": "F", "expr": "pg_query_stats_shared_blks_read", "format": "table", "instant": true },
-        { "refId": "G", "expr": "pg_query_stats_shared_blks_dirtied", "format": "table", "instant": true },
-        { "refId": "H", "expr": "pg_query_stats_shared_blks_written", "format": "table", "instant": true }
+        {
+          "refId": "A",
+          "expr": "pg_query_stats_calls",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "refId": "B",
+          "expr": "pg_query_stats_mean_exec_time_ms",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "refId": "C",
+          "expr": "pg_query_stats_mean_plan_time_ms",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "refId": "D",
+          "expr": "pg_query_stats_rows",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "refId": "E",
+          "expr": "pg_query_stats_shared_blks_hit",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "refId": "F",
+          "expr": "pg_query_stats_shared_blks_read",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "refId": "G",
+          "expr": "pg_query_stats_shared_blks_dirtied",
+          "format": "table",
+          "instant": true
+        },
+        {
+          "refId": "H",
+          "expr": "pg_query_stats_shared_blks_written",
+          "format": "table",
+          "instant": true
+        }
       ]
     }
   ]
